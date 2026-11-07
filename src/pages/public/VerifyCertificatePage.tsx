@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Alert } from '@/components/ui/Alert';
@@ -16,8 +17,18 @@ import { formatDate } from '@/lib/formatters';
 export function VerifyCertificatePage() {
   useDocumentTitle('Verify certificate');
 
-  const [input, setInput] = useState('');
-  const [serial, setSerial] = useState('');
+  const [searchParams] = useSearchParams();
+  const querySerial = searchParams.get('serial') || '';
+
+  const [input, setInput] = useState(querySerial);
+  const [serial, setSerial] = useState(querySerial);
+
+  useEffect(() => {
+    if (querySerial && querySerial !== serial) {
+      setInput(querySerial);
+      setSerial(querySerial);
+    }
+  }, [querySerial, serial]);
 
   const { data, isFetching, isError, error } = useVerifyCertificateQuery(serial, { skip: !serial });
 

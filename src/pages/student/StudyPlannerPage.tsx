@@ -18,8 +18,8 @@ import {
 } from '@/features/planner/plannerApi';
 import { useGetMyEnrollmentsQuery } from '@/features/enrollments/enrollmentsApi';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { formatDate } from '@/lib/formatters';
-import type { StudyTask, StudyTaskPriority, StudyTaskStatus } from '@/types';
+import { errorMessage, formatDate } from '@/lib/formatters';
+import type { EnrollmentDetail, StudyTask, StudyTaskPriority, StudyTaskStatus } from '@/types';
 
 export function StudyPlannerPage() {
   useDocumentTitle('Smart Study Planner');
@@ -98,8 +98,8 @@ export function StudyPlannerPage() {
       }
       setActionMessage('Task saved successfully.');
       setTimeout(() => setActionMessage(null), 4000);
-    } catch (err: any) {
-      setActionMessage(err?.data?.message || 'Failed to save task.');
+    } catch (err: unknown) {
+      setActionMessage(errorMessage(err, 'Failed to save task.'));
     }
   };
 
@@ -123,8 +123,8 @@ export function StudyPlannerPage() {
       setActionMessage(res.message);
       refetch();
       setTimeout(() => setActionMessage(null), 5000);
-    } catch (err: any) {
-      setActionMessage(err?.data?.message || 'Failed to generate suggestions.');
+    } catch (err: unknown) {
+      setActionMessage(errorMessage(err, 'Failed to generate suggestions.'));
     }
   };
 
@@ -144,8 +144,8 @@ export function StudyPlannerPage() {
       setConfirmDeleteId(null);
       setActionMessage('Task deleted.');
       setTimeout(() => setActionMessage(null), 3000);
-    } catch (err: any) {
-      setActionMessage(err?.data?.message || 'Failed to delete task.');
+    } catch (err: unknown) {
+      setActionMessage(errorMessage(err, 'Failed to delete task.'));
     }
   };
 
@@ -275,7 +275,7 @@ export function StudyPlannerPage() {
             placeholder="All Enrolled Courses"
             value={courseFilter}
             options={
-              enrollments?.items?.map((item: any) => ({
+              enrollments?.items?.map((item: EnrollmentDetail) => ({
                 value: typeof item.course === 'object' ? item.course.id : item.course,
                 label: typeof item.course === 'object' ? item.course.title : 'Course',
               })) || []
@@ -454,7 +454,7 @@ export function StudyPlannerPage() {
               placeholder="No course linked"
               value={taskCourseId}
               options={
-                enrollments?.items?.map((item: any) => ({
+                enrollments?.items?.map((item: EnrollmentDetail) => ({
                   value: typeof item.course === 'object' ? item.course.id : item.course,
                   label: typeof item.course === 'object' ? item.course.title : 'Course',
                 })) || []

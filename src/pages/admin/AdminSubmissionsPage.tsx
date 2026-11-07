@@ -10,7 +10,7 @@ import { SkeletonRows } from '@/components/ui/Skeleton';
 import { DataTable, type Column } from '@/components/ui/Table';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { formatDate, nameOf } from '@/lib/formatters';
+import { formatDate } from '@/lib/formatters';
 import { useListSubmissionsQuery } from '@/features/submissions/submissionsApi';
 import type { Submission, SubmissionStatus } from '@/types';
 
@@ -35,9 +35,19 @@ export function AdminSubmissionsPage() {
     status: status || undefined,
   });
 
+  const courseTitleOf = (courseValue: Submission['course']): string => {
+    if (!courseValue) return 'Unknown';
+    return typeof courseValue === 'string' ? courseValue : courseValue.title;
+  };
+
+  const studentNameOf = (studentValue: Submission['student']): string => {
+    if (!studentValue) return 'Unknown';
+    return typeof studentValue === 'string' ? studentValue : studentValue.fullName;
+  };
+
   const columns: Array<Column<Submission>> = [
-    { key: 'course', header: 'Course', render: (row: any) => nameOf(row.course) },
-    { key: 'student', header: 'Student', render: (row: any) => nameOf(row.student) },
+    { key: 'course', header: 'Course', render: (row) => courseTitleOf(row.course) },
+    { key: 'student', header: 'Student', render: (row) => studentNameOf(row.student) },
     {
       key: 'status',
       header: 'Status',
@@ -47,7 +57,7 @@ export function AdminSubmissionsPage() {
         </Badge>
       ),
     },
-    { key: 'grade', header: 'Grade', render: (row: any) => (row.grade !== undefined ? `${row.grade}` : '-') },
+    { key: 'grade', header: 'Grade', render: (row) => (row.grade !== undefined ? `${row.grade}` : '-') },
     { key: 'date', header: 'Submitted', render: (row) => formatDate(row.createdAt) },
   ];
 

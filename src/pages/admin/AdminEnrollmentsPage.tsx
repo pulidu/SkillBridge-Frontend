@@ -10,7 +10,7 @@ import { SkeletonRows } from '@/components/ui/Skeleton';
 import { DataTable, type Column } from '@/components/ui/Table';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { formatDate, nameOf } from '@/lib/formatters';
+import { formatDate } from '@/lib/formatters';
 import { useListEnrollmentsQuery } from '@/features/enrollments/enrollmentsApi';
 import type { Enrollment, EnrollmentStatus } from '@/types';
 
@@ -38,9 +38,19 @@ export function AdminEnrollmentsPage() {
     status: status || undefined,
   });
 
+  const courseNameOf = (courseValue: Enrollment['course']): string => {
+    if (!courseValue) return 'Unknown';
+    return typeof courseValue === 'string' ? courseValue : courseValue.title;
+  };
+
+  const studentNameOf = (studentValue: Enrollment['student']): string => {
+    if (!studentValue) return 'Unknown';
+    return typeof studentValue === 'string' ? studentValue : studentValue.fullName;
+  };
+
   const columns: Array<Column<Enrollment>> = [
-    { key: 'course', header: 'Course', render: (row: any) => nameOf(row.course) },
-    { key: 'student', header: 'Student', render: (row: any) => nameOf(row.student) },
+    { key: 'course', header: 'Course', render: (row) => courseNameOf(row.course) },
+    { key: 'student', header: 'Student', render: (row) => studentNameOf(row.student) },
     {
       key: 'status',
       header: 'Status',
@@ -51,7 +61,7 @@ export function AdminEnrollmentsPage() {
       ),
     },
     { key: 'progress', header: 'Progress', render: (row) => `${row.progress ?? 0}%` },
-    { key: 'date', header: 'Enrolled', render: (row) => formatDate((row as any).enrolledAt ?? row.createdAt) },
+    { key: 'date', header: 'Enrolled', render: (row) => formatDate(row.createdAt) },
   ];
 
   return (
